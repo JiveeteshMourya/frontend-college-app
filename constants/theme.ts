@@ -16,6 +16,9 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+
+    progressBar: '#0091ffff',
+    textMuted: '#B2BEB5',
   },
   dark: {
     text: '#ECEDEE',
@@ -25,6 +28,19 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+};
+
+export const FontSizes = {
+  mainHeading: 32,
+  heading: 24,
+  subHeading: 18,
+  body: 16,
+  caption: 12,
+};
+export const FontWeights = {
+  regular: '400',
+  medium: '500',
+  bold: '700',
 };
 
 export const Fonts = Platform.select({
