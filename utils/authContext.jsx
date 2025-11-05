@@ -2,11 +2,10 @@ import * as SecureStore from 'expo-secure-store';
 import { SplashScreen, useRouter } from 'expo-router';
 import { createContext, useEffect, useState, useCallback } from 'react';
 import NetInfo from '@react-native-community/netinfo';
+import { authStorageKey, backendUrl } from '../constants/constants.js';
 
 // keep splash from auto-hiding until we're ready
 SplashScreen.preventAutoHideAsync();
-
-const authStorageKey = process.env.AUTH_STORAGE_KEY || 'auth_token';
 
 export const AuthContext = createContext({
   isLoggedIn: false,
@@ -40,21 +39,18 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logIn = async backendResponse => {
-    const userRole = backendResponse?.userType ?? 0;
-    const accessToken = backendResponse?.authToken ?? null;
-
+  const logIn = async (userType, accessToken, refreshToken) => {
     setIsLoggedIn(true);
-    setUserType(userRole);
+    setUserType(userType);
     setAuthToken(accessToken);
 
     await storeAuthState({
       isLoggedIn: true,
-      userType: userRole,
+      userType,
       authToken: accessToken,
+      refreshToken,
     });
 
-    // send user to home (or change as per your flow)
     router.replace('/');
   };
 
@@ -67,7 +63,11 @@ export function AuthProvider({ children }) {
       isLoggedIn: false,
       userType: 0,
       authToken: null,
+      refreshToken: null,
     });
+
+    // Delete tokens from SecureStore
+    await SecureStore.deleteItemAsync(authStorageKey);
 
     router.replace('/login');
   };
@@ -83,13 +83,10 @@ export function AuthProvider({ children }) {
       }
 
       // 2) backend health check
-      // use your public env var: BACKEND_URL (set in app config / .env)
-      const baseUrl =
-        process.env.BACKEND_URL || 'https://backend-college-app-il9r.onrender.com/api/v1';
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 7000); // 7s timeout
 
-      const res = await fetch(`${baseUrl}/health`, {
+      const res = await fetch(`${backendUrl}/health`, {
         method: 'GET',
         signal: controller.signal,
       });
