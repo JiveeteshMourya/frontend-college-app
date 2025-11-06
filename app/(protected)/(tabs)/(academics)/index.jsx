@@ -1,13 +1,10 @@
-import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
+import { Colors } from '../../../../constants/theme';
 
-import { Link } from 'expo-router';
-import { Colors } from '../../../constants/theme';
-
-export default function HomeScreen() {
+export default function TestScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.mainHeading}>Home Screen</Text>
+      <Text style={styles.mainHeading}>Test Screen</Text>
     </View>
   );
 }

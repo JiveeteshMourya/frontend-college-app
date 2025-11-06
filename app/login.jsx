@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Colors, FontSizes, FontWeights } from '../constants/theme';
 import { Picker } from '@react-native-picker/picker';
 import Button from '../components/Button';
@@ -7,29 +7,24 @@ import api from '../utils/axios.js';
 import { AuthContext } from '../utils/authContext.jsx';
 
 export default function LoginScreen() {
-  const [userType, setUserType] = useState('');
+  const [userType, setUserType] = useState(0);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [showOtpForm, setShowOtpForm] = useState(false);
   const { logIn } = useContext(AuthContext);
-
-  const userTypeMap = {
-    student: 0,
-    parent: 1,
-    teacher: 2,
-    department: 3,
-    club: 4,
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
-      const res = await api.post(`/auth/login/${userTypeMap[userType]}`, { email, password });
+      const res = await api.post(`/auth/login/${userType}`, { email, password });
       if (res.status === 200) {
+        setLoading(false);
         setShowOtpForm(true);
       }
-
       if (res.status !== 200) {
+        setLoading(false);
         Alert.alert('Login Failed', res.data?.message || 'An error occurred during login.');
       }
     } catch (err) {
@@ -39,15 +34,22 @@ export default function LoginScreen() {
 
   const handleOtpSubmit = async () => {
     try {
-      const res = await api.post(`/auth/verify-otp/${userTypeMap[userType]}`, {
+      setLoading(true);
+      const res = await api.post(`/auth/verify-otp/${userType}`, {
         email,
         otpCode: otp,
       });
       if (res.status === 200) {
-        await logIn(userType, res.data.accessToken, res.data.refreshToken);
+        setLoading(false);
+        await logIn(
+          userType,
+          res.data.data.accessToken,
+          res.data.data.refreshToken,
+          res.data.data.user._id
+        );
       }
-
       if (res.status !== 200) {
+        setLoading(false);
         Alert.alert(
           'OTP Failed',
           res.data?.message || 'An error occurred during OTP verification.'
@@ -57,6 +59,14 @@ export default function LoginScreen() {
       console.log(err);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={Colors.light.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -72,12 +82,12 @@ export default function LoginScreen() {
               onValueChange={itemValue => setUserType(itemValue)}
               style={styles.picker}
             >
-              <Picker.Item label="Select User Type" value="" />
-              <Picker.Item label="Parent" value="parent" />
-              <Picker.Item label="Student" value="student" />
-              <Picker.Item label="Teacher" value="teacher" />
-              <Picker.Item label="Dept/Club" value="department" />
-              <Picker.Item label="Club" value="club" />
+              <Picker.Item label="Select User Type" value={-1} />
+              <Picker.Item label="Student" value={0} />
+              <Picker.Item label="Parent" value={1} />
+              <Picker.Item label="Teacher" value={2} />
+              <Picker.Item label="Dept/Club" value={3} />
+              <Picker.Item label="Club" value={4} />
             </Picker>
           </View>
 
@@ -181,5 +191,10 @@ const styles = StyleSheet.create({
     color: Colors.light.background,
     fontSize: FontSizes.subHeading,
     fontWeight: FontWeights.bold,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

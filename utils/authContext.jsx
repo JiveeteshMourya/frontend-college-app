@@ -11,6 +11,7 @@ export const AuthContext = createContext({
   isLoggedIn: false,
   userType: 0,
   authToken: null,
+  userId: null,
   isReady: false, // restored auth state
   appReady: false, // network + server up
   logIn: async () => {},
@@ -24,6 +25,7 @@ export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(0);
   const [authToken, setAuthToken] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   // this is true when device has internet AND the backend /health responds 200
   const [upAndConnected, setUpAndConnected] = useState(false);
@@ -39,16 +41,18 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logIn = async (userType, accessToken, refreshToken) => {
+  const logIn = async (userType, accessToken, refreshToken, userId) => {
     setIsLoggedIn(true);
     setUserType(userType);
     setAuthToken(accessToken);
+    setUserId(userId);
 
     await storeAuthState({
       isLoggedIn: true,
       userType,
       authToken: accessToken,
       refreshToken,
+      userId,
     });
 
     router.replace('/');
@@ -58,12 +62,14 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false);
     setUserType(0);
     setAuthToken(null);
+    setUserId(null);
 
     await storeAuthState({
       isLoggedIn: false,
       userType: 0,
       authToken: null,
       refreshToken: null,
+      userId: null,
     });
 
     // Delete tokens from SecureStore
@@ -120,6 +126,7 @@ export function AuthProvider({ children }) {
           setIsLoggedIn(!!auth.isLoggedIn);
           setUserType(auth.userType || 0);
           setAuthToken(auth.authToken || null);
+          setUserId(auth.userId || null);
 
           if (auth.isLoggedIn) {
             // If you want auto-redirect after restore:
@@ -161,6 +168,28 @@ export function AuthProvider({ children }) {
   // computed appReady exposed to consumers
   const appReady = !!(isReady && upAndConnected);
 
+  // const resetAuth = async (opts = { navigate: false }) => {
+  //   // clear in-memory state
+  //   setIsLoggedIn(false);
+  //   setUserType(0);
+  //   setAuthToken(null);
+  //   setUserId(null);
+  //   setIsReady(false);
+  //   setUpAndConnected(false);
+
+  //   // remove persistent store
+  //   try {
+  //     await SecureStore.deleteItemAsync(authStorageKey);
+  //   } catch (e) {
+  //     console.log('Error deleting SecureStore key', e);
+  //   }
+
+  //   // optional: navigate to login if requested
+  //   if (opts.navigate) {
+  //     router.replace('/login');
+  //   }
+  // };
+
   return (
     <AuthContext.Provider
       value={{
@@ -168,11 +197,13 @@ export function AuthProvider({ children }) {
         isLoggedIn,
         userType,
         authToken,
+        userId,
         logIn,
         logOut,
         appReady,
         checkServer,
         setAppReady: setUpAndConnected, // allowed if you want to set from UI, but prefer checkServer()
+        // resetAuth,
       }}
     >
       {children}

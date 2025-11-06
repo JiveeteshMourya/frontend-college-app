@@ -1,11 +1,10 @@
-import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../../constants/theme';
+import { Colors } from '../../../../constants/theme';
 
-export default function TabTwoScreen() {
+export default function MyDepartmentScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.mainHeading}>Explore Screen</Text>
+      <Text style={styles.mainHeading}>My Department Events Screen</Text>
     </View>
   );
 }
