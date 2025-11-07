@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../../../constants/theme';
+import { Colors } from '../../../../../constants/theme';
 
-export default function TestScreen() {
+export default function InternalMarksScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.mainHeading}>Test Screen</Text>
+      <Text style={styles.mainHeading}>Internal Marks Screen</Text>
     </View>
   );
 }

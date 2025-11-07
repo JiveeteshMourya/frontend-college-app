@@ -86,8 +86,8 @@ export default function LoginScreen() {
               <Picker.Item label="Student" value={0} />
               <Picker.Item label="Parent" value={1} />
               <Picker.Item label="Teacher" value={2} />
-              <Picker.Item label="Dept/Club" value={3} />
-              <Picker.Item label="Club" value={4} />
+              {/* <Picker.Item label="Dept/Club" value={3} />
+              <Picker.Item label="Club" value={4} /> */}
             </Picker>
           </View>
 

@@ -13,14 +13,14 @@ export default function TabLayout() {
       }}
     >
       <TopTabs.Screen
-        name="internalMarks"
+        name="(internalMarks)"
         options={{
           title: 'Internal Marks',
           tabBarLabel: 'Internal Marks',
         }}
       />
       <TopTabs.Screen
-        name="index"
+        name="(tests)"
         options={{
           title: 'Tests',
           tabBarLabel: 'Tests',
