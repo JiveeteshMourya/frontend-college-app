@@ -54,17 +54,11 @@ export default function TestScreen() {
     setLoading(true);
     try {
       let endpoint = '';
-
       if (userType === 0 || userType === 2) {
-        // Build endpoint dynamically
-        if (!selectedStatus && !selectedClass) {
-          endpoint = '/test/my-tests'; // No filters applied
-        } else {
-          const params = [];
-          if (selectedStatus) params.push(`status=${selectedStatus}`);
-          if (selectedClass) params.push(`class=${selectedClass}`);
-          endpoint = `/test/my-tests?${params.join('&')}`;
-        }
+        const params = [];
+        if (selectedStatus) params.push(`status=${selectedStatus}`);
+        if (selectedClass) params.push(`class=${selectedClass}`);
+        endpoint = params.length > 0 ? `/test/my-tests?${params.join('&')}` : '/test/my-tests';
 
         const res = await api.post(endpoint);
         if (res.status === 200) setTests(res.data.data || []);
@@ -84,22 +78,60 @@ export default function TestScreen() {
     const classLabel = classId
       ? `${classId.stream} ${classId.semester} - ${classId.subject} (${classId.courseType})`
       : 'Unknown Class';
+    const date = new Date(item.date).toDateString();
 
     return (
       <TouchableOpacity
         style={styles.card}
+        activeOpacity={0.85}
         onPress={() => router.push({ pathname: 'testDetails', params: { id: item._id } })}
       >
-        <Text style={styles.testTitle}>
-          {item.type} Test {item.number}
-        </Text>
-        <Text style={styles.testInfo}>Class: {classLabel}</Text>
-        <Text style={styles.testInfo}>Date: {new Date(item.date).toDateString()}</Text>
-        <Text style={styles.testInfo}>Status: {item.status}</Text>
-        {item.teacherId && (
-          <Text style={styles.testInfo}>
-            Teacher: {item.teacherId.firstName} {item.teacherId.lastName}
+        <View style={styles.cardHeader}>
+          <Ionicons name="document-text-outline" size={22} color="teal" />
+          <Text style={styles.testTitle}>
+            {item.type} Test {item.number}
           </Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons name="school-outline" size={16} color="#777" />
+          <Text style={styles.testInfo}>{classLabel}</Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons name="calendar-outline" size={16} color="#777" />
+          <Text style={styles.testInfo}>Date: {date}</Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons
+            name={
+              item.status === 'SCHEDULED'
+                ? 'time-outline'
+                : item.status === 'COMPLETED'
+                  ? 'checkmark-circle-outline'
+                  : 'close-circle-outline'
+            }
+            size={16}
+            color={
+              item.status === 'SCHEDULED'
+                ? '#0077b6'
+                : item.status === 'COMPLETED'
+                  ? 'green'
+                  : 'red'
+            }
+          />
+          <Text style={[styles.testInfo, styles.statusText]}>{item.status}</Text>
+        </View>
+
+        {item.teacherId && (
+          <View style={styles.infoRow}>
+            <Ionicons name="person-outline" size={16} color="#777" />
+            <Text style={styles.testInfo}>
+              {/* {item.teacherId.firstName} {item.teacherId.lastName} */}
+              Test Teacher
+            </Text>
+          </View>
         )}
       </TouchableOpacity>
     );
@@ -109,17 +141,21 @@ export default function TestScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={Colors.light.primary} />
+        <Text style={{ color: Colors.light.text, marginTop: 10 }}>Loading Tests...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.mainHeading}>Tests</Text>
-
-      {/* Filters (only for teacher/student) */}
+      {/* Filters */}
       {userType !== 1 && (
         <View style={styles.filterContainer}>
+          <View style={styles.filterHeader}>
+            <Ionicons name="funnel-outline" size={18} color="teal" />
+            <Text style={styles.filterTitle}>Filters</Text>
+          </View>
+
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={selectedStatus}
@@ -157,15 +193,17 @@ export default function TestScreen() {
           data={tests}
           renderItem={renderTestCard}
           keyExtractor={item => item._id}
-          verticle
-          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
         />
       ) : (
-        <Text style={styles.noDataText}>No tests found.</Text>
+        <View style={styles.noDataContainer}>
+          <Ionicons name="alert-circle-outline" size={40} color="#999" />
+          <Text style={styles.noDataText}>No tests found.</Text>
+        </View>
       )}
 
-      {/* Floating Add Button for Teachers */}
+      {/* Floating Add Button */}
       {userType === 2 && (
         <TouchableOpacity style={styles.fab} onPress={() => router.push('createTest')}>
           <Ionicons name="add" size={32} color="white" />
@@ -182,14 +220,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 20,
   },
-  mainHeading: {
-    fontSize: FontSizes.mainHeading,
-    fontWeight: FontWeights.bold,
-    color: Colors.light.text,
-    marginBottom: 16,
-  },
   filterContainer: {
-    marginBottom: 10,
+    backgroundColor: Colors.light.card,
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: Colors.light.border || 'rgba(0,0,0,0.1)',
+  },
+  filterHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  filterTitle: {
+    fontWeight: '600',
+    fontSize: 15,
+    color: Colors.light.text,
+    marginLeft: 6,
   },
   pickerContainer: {
     borderWidth: 1,
@@ -202,49 +250,61 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
   },
   listContainer: {
-    paddingBottom: 20,
-    paddingHorizontal: 5,
+    paddingBottom: 90,
   },
   card: {
-    width: width * 0.9, // 90% of screen width
-    height: 180, // rectangular look
-    backgroundColor: 'white',
+    backgroundColor: Colors.light.card,
     padding: 16,
-    borderRadius: 16,
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-    justifyContent: 'center',
+    borderRadius: 14,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: Colors.light.border || 'rgba(0,0,0,0.1)',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   testTitle: {
-    fontSize: FontSizes.subHeading,
+    fontSize: 17,
     fontWeight: FontWeights.bold,
     color: Colors.light.text,
-    marginBottom: 8,
+    marginLeft: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   testInfo: {
-    fontSize: FontSizes.body,
+    fontSize: 14,
     color: Colors.light.text,
-    marginBottom: 3,
+    marginLeft: 6,
+  },
+  statusText: {
+    textTransform: 'capitalize',
+  },
+  noDataContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
   },
   noDataText: {
     textAlign: 'center',
-    color: Colors.light.icon,
-    marginTop: 40,
+    color: '#888',
+    marginTop: 10,
+    fontSize: 15,
   },
   fab: {
     position: 'absolute',
     bottom: 30,
     right: 20,
-    backgroundColor: Colors.light.tint,
+    backgroundColor: 'teal',
     borderRadius: 50,
     width: 60,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 6,
   },
   center: {
     flex: 1,

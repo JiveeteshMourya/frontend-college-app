@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { Colors } from '../../../constants/theme';
 import { AuthContext } from '../../../utils/authContext';
@@ -46,7 +46,7 @@ export default function InfoScreen() {
 
   const renderDetails = () => {
     switch (userType) {
-      case 0: // Student
+      case 0:
         return (
           <>
             <Text style={styles.value}>Roll No: {info.rollNum}</Text>
@@ -62,8 +62,7 @@ export default function InfoScreen() {
             <Text style={styles.value}>Address: {info.address}</Text>
           </>
         );
-
-      case 1: // Parent
+      case 1:
         return (
           <>
             <Text style={styles.value}>Occupation: {info.occupation}</Text>
@@ -71,8 +70,7 @@ export default function InfoScreen() {
             <Text style={styles.value}>Address: {info.address}</Text>
           </>
         );
-
-      case 2: // Teacher
+      case 2:
         return (
           <>
             <Text style={styles.value}>Employee ID: {info.empId}</Text>
@@ -83,19 +81,31 @@ export default function InfoScreen() {
             <Text style={styles.value}>Address: {info.address}</Text>
           </>
         );
-
       default:
         return <Text style={styles.value}>Unknown user type</Text>;
     }
   };
 
   const handleLogout = async () => {
-    await logOut();
+    Alert.alert('Confirm Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Yes, Logout',
+        style: 'destructive',
+        onPress: async () => {
+          await logOut();
+        },
+      },
+    ]);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile Section */}
         <View style={styles.profileSection}>
           {info.imageId ? (
             <Image source={{ uri: `${backendUrl}/image/${info.imageId}` }} style={styles.image} />
@@ -107,6 +117,7 @@ export default function InfoScreen() {
               </Text>
             </View>
           )}
+
           <Text style={styles.mainHeading}>
             {info.firstName} {info.lastName || ''}
           </Text>
@@ -115,6 +126,7 @@ export default function InfoScreen() {
           <Text style={styles.subText}>Gender: {info.gender || 'N/A'}</Text>
         </View>
 
+        {/* Info Card */}
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Personal Information</Text>
           <View style={styles.divider} />
@@ -122,6 +134,7 @@ export default function InfoScreen() {
         </View>
       </ScrollView>
 
+      {/* Logout Button */}
       <View style={styles.logoutWrapper}>
         <Button title="Logout" onPress={handleLogout} style={styles.logoutButton} />
       </View>
@@ -139,65 +152,22 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingBottom: 100,
   },
-  mainHeading: {
-    color: Colors.light.text,
-    fontSize: 22,
-    fontWeight: '600',
-    marginTop: 10,
-  },
-  subText: {
-    color: Colors.light.textSecondary || '#555',
-    marginVertical: 2,
+  profileSection: {
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '90%',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.light.border || 'rgba(0,0,0,0.1)',
+    paddingVertical: 20,
+    backgroundColor: Colors.light.card,
   },
   image: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginTop: 20,
-  },
-  value: {
-    color: Colors.light.text,
-    fontSize: 16,
-    marginVertical: 4,
-  },
-  divider: {
-    height: 1,
-    width: '80%',
-    backgroundColor: '#ccc',
-    marginVertical: 10,
-  },
-  logoutText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  infoCard: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.light.primary,
+    borderWidth: 2,
+    borderColor: 'teal',
     marginBottom: 10,
   },
   imagePlaceholder: {
@@ -207,12 +177,58 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    borderWidth: 2,
+    borderColor: 'teal',
+    marginBottom: 10,
   },
   placeholderText: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#666',
+  },
+  mainHeading: {
+    color: Colors.light.text,
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  subText: {
+    color: Colors.light.textSecondary || '#555',
+    fontSize: 14,
+    marginVertical: 2,
+  },
+  infoCard: {
+    width: '90%',
+    backgroundColor: Colors.light.card,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: Colors.light.border || 'rgba(0,0,0,0.1)',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.light.primary || 'teal',
+    marginBottom: 6,
+  },
+  divider: {
+    height: 1,
+    width: '100%',
+    backgroundColor: Colors.light.border || '#ccc',
+    marginVertical: 10,
+  },
+  value: {
+    color: Colors.light.text,
+    fontSize: 15,
+    marginVertical: 4,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
   },
   logoutWrapper: {
     position: 'absolute',
@@ -223,6 +239,6 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     width: '60%',
-    backgroundColor: 'red',
+    backgroundColor: 'crimson',
   },
 });

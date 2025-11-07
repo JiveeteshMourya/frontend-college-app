@@ -44,15 +44,6 @@ const NewsList = () => {
       {/* Header Tabs */}
       <View style={styles.tabRow}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'latest' && styles.activeTab]}
-          onPress={() => setActiveTab('latest')}
-        >
-          <Text style={[styles.tabText, activeTab === 'latest' && styles.activeText]}>
-            Latest Update
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={[styles.tab, activeTab === 'all' && styles.activeTab]}
           onPress={() => setActiveTab('all')}
         >

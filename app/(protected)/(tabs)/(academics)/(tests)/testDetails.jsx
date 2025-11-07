@@ -46,7 +46,6 @@ export default function TestDetailsScreen() {
 
   const handleStatusUpdate = async newStatus => {
     if (!test) return;
-
     Alert.alert(
       'Confirm Status Change',
       `Are you sure you want to mark this test as ${newStatus}?`,
@@ -94,8 +93,9 @@ export default function TestDetailsScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.mainHeading}>Test Details</Text>
+      <Text style={styles.mainHeading}>🧾 Test Details</Text>
 
+      {/* --- Test Overview --- */}
       <View style={styles.card}>
         <Text style={styles.label}>Type:</Text>
         <Text style={styles.value}>{test.type}</Text>
@@ -107,15 +107,12 @@ export default function TestDetailsScreen() {
         <Text style={styles.value}>{new Date(test.date).toDateString()}</Text>
 
         <Text style={styles.label}>Status:</Text>
-        <Text style={[styles.value, { fontWeight: FontWeights.bold }]}>{status}</Text>
+        <Text style={[styles.value, { fontWeight: FontWeights.bold, color: statusColor(status) }]}>
+          {status}
+        </Text>
 
         {test.updatedAt && (
-          <Text
-            style={[
-              styles.infoText,
-              { marginTop: 4, fontStyle: 'italic', color: Colors.light.icon },
-            ]}
-          >
+          <Text style={styles.infoText}>
             Last updated on {new Date(test.updatedAt).toLocaleString()}
           </Text>
         )}
@@ -162,8 +159,9 @@ export default function TestDetailsScreen() {
         )}
       </View>
 
+      {/* --- Class Info --- */}
       <View style={styles.card}>
-        <Text style={styles.subHeading}>Class Information</Text>
+        <Text style={styles.subHeading}>🏫 Class Information</Text>
         {classId ? (
           <Text style={styles.infoText}>
             {classId.stream} {classId.semester} - {classId.subject} ({classId.courseType})
@@ -173,8 +171,9 @@ export default function TestDetailsScreen() {
         )}
       </View>
 
+      {/* --- Teacher Info --- */}
       <View style={styles.card}>
-        <Text style={styles.subHeading}>Teacher Information</Text>
+        <Text style={styles.subHeading}>👩‍🏫 Teacher Information</Text>
         {teacherId ? (
           <>
             <Text style={styles.infoText}>
@@ -188,7 +187,7 @@ export default function TestDetailsScreen() {
         )}
       </View>
 
-      {/* Teacher-only action buttons */}
+      {/* --- Teacher Actions --- */}
       {userType === 2 && (
         <View style={styles.actionsRow}>
           <TouchableOpacity
@@ -196,11 +195,7 @@ export default function TestDetailsScreen() {
             onPress={() =>
               router.push({
                 pathname: 'createTest',
-                params: {
-                  mode: 'edit',
-                  id: test._id,
-                  test: JSON.stringify(test),
-                },
+                params: { mode: 'edit', id: test._id, test: JSON.stringify(test) },
               })
             }
           >
@@ -209,7 +204,7 @@ export default function TestDetailsScreen() {
 
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: 'crimson' }]}
-            onPress={async () => {
+            onPress={() => {
               Alert.alert('Confirm Delete', 'Cancel this test?', [
                 { text: 'No', style: 'cancel' },
                 {
@@ -245,55 +240,76 @@ export default function TestDetailsScreen() {
   );
 }
 
+function statusColor(status) {
+  switch (status) {
+    case 'COMPLETED':
+      return 'green';
+    case 'SCHEDULED':
+      return '#0077b6';
+    case 'CANCELLED':
+      return 'crimson';
+    default:
+      return Colors.light.text;
+  }
+}
+
 const styles = StyleSheet.create({
-  container: { padding: 24, backgroundColor: Colors.light.background },
+  container: {
+    padding: 20,
+    backgroundColor: Colors.light.background,
+  },
   mainHeading: {
-    fontSize: FontSizes.mainHeading,
-    fontWeight: FontWeights.bold,
+    fontSize: 24,
+    fontWeight: '700',
     color: Colors.light.text,
-    marginBottom: 20,
+    marginBottom: 18,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
+    backgroundColor: Colors.light.card,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.light.border || 'rgba(0,0,0,0.1)',
   },
   label: {
-    fontSize: FontSizes.body,
-    fontWeight: FontWeights.medium,
+    fontSize: 14,
+    fontWeight: '600',
     color: Colors.light.icon,
     marginTop: 6,
   },
   value: {
-    fontSize: FontSizes.body,
+    fontSize: 15,
     color: Colors.light.text,
+    marginBottom: 4,
   },
   subHeading: {
-    fontSize: FontSizes.subHeading,
-    fontWeight: FontWeights.bold,
+    fontSize: 17,
+    fontWeight: '700',
     color: Colors.light.text,
     marginBottom: 8,
   },
-  infoText: { fontSize: FontSizes.body, color: Colors.light.text },
+  infoText: {
+    fontSize: 14,
+    color: Colors.light.text,
+    marginTop: 2,
+  },
   pickerContainer: {
     borderWidth: 1,
     borderColor: Colors.light.icon,
     borderRadius: 8,
-    marginTop: 6,
-    marginBottom: 10,
+    marginTop: 8,
+    marginBottom: 12,
     overflow: 'hidden',
   },
-  picker: { color: Colors.light.text },
+  picker: {
+    color: Colors.light.text,
+  },
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginTop: 20,
+    marginTop: 18,
   },
   actionButton: {
     flex: 1,
@@ -304,9 +320,19 @@ const styles = StyleSheet.create({
   },
   actionText: {
     color: 'white',
-    fontWeight: FontWeights.bold,
-    fontSize: FontSizes.body,
+    fontWeight: '600',
+    fontSize: 15,
   },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  errorText: { color: Colors.light.icon, fontSize: FontSizes.body },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: Colors.light.icon,
+    fontSize: 15,
+  },
+  statusUpdateBox: {
+    marginTop: 8,
+  },
 });

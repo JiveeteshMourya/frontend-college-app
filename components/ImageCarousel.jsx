@@ -15,7 +15,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const ITEM_WIDTH = Math.round(SCREEN_WIDTH * 0.85);
 const ITEM_SPACING = Math.round((SCREEN_WIDTH - ITEM_WIDTH) / 2);
 
-export default function ImageCarousel({ images = [] }) {
+export default function ImageCarousel({ images = [], height = 160 }) {
   const flatRef = useRef(null);
   const [index, setIndex] = useState(0);
   const [fullscreenVisible, setFullscreenVisible] = useState(false);
@@ -32,24 +32,23 @@ export default function ImageCarousel({ images = [] }) {
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() => setFullscreenVisible(true)}
-      style={styles.itemContainer}
+      style={[styles.itemContainer, { height }]}
     >
       <Image source={{ uri: item }} style={styles.image} resizeMode="cover" />
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: height + 40 }]}>
       <FlatList
         ref={flatRef}
         data={images}
         horizontal
-        pagingEnabled={false} // we'll use snap via deceleration + snapToInterval
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, i) => item + i}
         renderItem={renderItem}
         contentContainerStyle={{ paddingHorizontal: ITEM_SPACING }}
-        snapToInterval={ITEM_WIDTH + 12} // account for margin
+        snapToInterval={ITEM_WIDTH + 12}
         decelerationRate="fast"
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
@@ -68,7 +67,7 @@ export default function ImageCarousel({ images = [] }) {
         ))}
       </View>
 
-      {/* Fullscreen modal */}
+      {/* Fullscreen Modal */}
       <Modal visible={fullscreenVisible} animationType="fade" transparent>
         <View style={styles.modalOverlay}>
           <Pressable style={styles.closeButton} onPress={() => setFullscreenVisible(false)}>
@@ -87,12 +86,12 @@ export default function ImageCarousel({ images = [] }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    height: '75%',
+    flex: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   itemContainer: {
     width: ITEM_WIDTH,
-    height: ITEM_WIDTH * 0.85,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#eee',
@@ -104,12 +103,12 @@ const styles = StyleSheet.create({
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingTop: 10,
+    paddingTop: 6,
   },
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 8 / 2,
+    borderRadius: 4,
     marginHorizontal: 6,
   },
   dotActive: { backgroundColor: '#111' },
@@ -132,8 +131,11 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 10,
     padding: 8,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 6,
   },
-  closeText: { color: 'white' },
+  closeText: {
+    color: 'white',
+    fontSize: 14,
+  },
 });
