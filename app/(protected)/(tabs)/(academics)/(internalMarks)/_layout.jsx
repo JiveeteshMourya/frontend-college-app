@@ -17,17 +17,12 @@ export default function StackLayout() {
           title: 'Internal Marks',
         }}
       />
-      <Stack.Screen
-        name="testDetails"
-        options={{
-          title: 'Test Details',
-        }}
-      />
+
       <Stack.Protected guard={userType === 2}>
         <Stack.Screen
-          name="createTest"
+          name="createAttendance"
           options={{
-            title: 'Create Test',
+            title: 'Create Attendance',
           }}
         />
       </Stack.Protected>

@@ -25,6 +25,7 @@ export default function Splash() {
     const loadApp = async () => {
       setStatus('Checking internet...');
       animateProgress(0.2);
+      await new Promise(res => setTimeout(res, 2000));
 
       const ok = await checkServer();
       if (!ok) {
@@ -35,10 +36,13 @@ export default function Splash() {
       setStatus('Server connected !!');
       animateProgress(0.6);
 
-      // mimic local auth initialization delay
-      await new Promise(res => setTimeout(res, 800));
-
+      await new Promise(res => setTimeout(res, 2000));
       setStatus('Finalizing setup...');
+      animateProgress(0.9);
+
+      // mimic local auth initialization delay
+      await new Promise(res => setTimeout(res, 3000));
+
       animateProgress(1.0);
 
       // wait a bit for visual polish

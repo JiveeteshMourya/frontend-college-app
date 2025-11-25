@@ -1,7 +1,15 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors } from '../../../../../constants/theme';
+import { useContext } from 'react';
+import { AuthContext } from '@/utils/authContext';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import AttendanceCalendar from '../../../../../components/Calendar';
 
 export default function InternalMarksScreen() {
+  const { userType, userId } = useContext(AuthContext);
+  const router = useRouter();
+
   // --- Maximum Marks Slab ---
   const maxMarks = [
     {
@@ -213,106 +221,120 @@ export default function InternalMarksScreen() {
   ];
 
   return (
-    <ScrollView style={styles.wrapper} contentContainerStyle={styles.container}>
-      {/* --- Maximum Marks Table --- */}
-      <View style={styles.tableSection}>
-        <Text style={styles.subHeading}>Maximum Marks Slab</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-          <View>
-            <View style={[styles.row, styles.headerRow]}>
-              <Text style={[styles.headerCell, { width: 60 }]}>S.No</Text>
-              <Text style={[styles.headerCell, { width: 110 }]}>Paper</Text>
-              <Text style={[styles.headerCell, { width: 200 }]}>Paper Title</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Max</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Test</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Quiz</Text>
-              <Text style={[styles.headerCell, { width: 100 }]}>Attendance</Text>
-            </View>
-            {maxMarks.map(item => (
-              <View key={item.id} style={styles.row}>
-                <Text style={[styles.cell, { width: 60 }]}>{item.id}</Text>
-                <Text style={[styles.cell, { width: 110 }]}>{item.paper}</Text>
-                <Text style={[styles.cell, { width: 200 }]}>{item.title}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.max}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.test}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.quiz}</Text>
-                <Text style={[styles.cell, { width: 100 }]}>{item.attendance}</Text>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+    <>
+      <ScrollView style={styles.wrapper} contentContainerStyle={styles.container}>
+        <AttendanceCalendar studentId={userId} />
 
-      {/* --- Obtained Marks Table --- */}
-      <View style={styles.tableSection}>
-        <Text style={styles.subHeading}>Obtained Marks Details</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-          <View>
-            <View style={[styles.row, styles.headerRow]}>
-              <Text style={[styles.headerCell, { width: 60 }]}>S.No</Text>
-              <Text style={[styles.headerCell, { width: 200 }]}>Paper Title</Text>
-              <Text style={[styles.headerCell, { width: 60 }]}>Sec</Text>
-              <Text style={[styles.headerCell, { width: 70 }]}>T1</Text>
-              <Text style={[styles.headerCell, { width: 70 }]}>T2</Text>
-              <Text style={[styles.headerCell, { width: 70 }]}>T3</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Best</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Assg</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Atn</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Total</Text>
+        {userType !== 2 && (
+          <>
+            {/* --- Maximum Marks Table --- */}
+            <View style={styles.tableSection}>
+              <Text style={styles.subHeading}>Maximum Marks Slab</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                <View>
+                  <View style={[styles.row, styles.headerRow]}>
+                    <Text style={[styles.headerCell, { width: 60 }]}>S.No</Text>
+                    <Text style={[styles.headerCell, { width: 110 }]}>Paper</Text>
+                    <Text style={[styles.headerCell, { width: 200 }]}>Paper Title</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Max</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Test</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Quiz</Text>
+                    <Text style={[styles.headerCell, { width: 100 }]}>Attendance</Text>
+                  </View>
+                  {maxMarks.map(item => (
+                    <View key={item.id} style={styles.row}>
+                      <Text style={[styles.cell, { width: 60 }]}>{item.id}</Text>
+                      <Text style={[styles.cell, { width: 110 }]}>{item.paper}</Text>
+                      <Text style={[styles.cell, { width: 200 }]}>{item.title}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.max}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.test}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.quiz}</Text>
+                      <Text style={[styles.cell, { width: 100 }]}>{item.attendance}</Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
             </View>
-            {obtainedMarks.map(item => (
-              <View key={item.id} style={styles.row}>
-                <Text style={[styles.cell, { width: 60 }]}>{item.id}</Text>
-                <Text style={[styles.cell, { width: 200 }]}>{item.title}</Text>
-                <Text style={[styles.cell, { width: 60 }]}>{item.sec}</Text>
-                <Text style={[styles.cell, { width: 70 }]}>{item.t1}</Text>
-                <Text style={[styles.cell, { width: 70 }]}>{item.t2}</Text>
-                <Text style={[styles.cell, { width: 70 }]}>{item.t3}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.best}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.assg}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.atn}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.total}</Text>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
 
-      {/* --- Attendance Table --- */}
-      <View style={styles.tableSection}>
-        <Text style={styles.subHeading}>Attendance Details</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-          <View>
-            <View style={[styles.row, styles.headerRow]}>
-              <Text style={[styles.headerCell, { width: 60 }]}>S.No</Text>
-              <Text style={[styles.headerCell, { width: 200 }]}>Paper Title</Text>
-              <Text style={[styles.headerCell, { width: 60 }]}>Sec</Text>
-              <Text style={[styles.headerCell, { width: 70 }]}>Atn1</Text>
-              <Text style={[styles.headerCell, { width: 70 }]}>Atn2</Text>
-              <Text style={[styles.headerCell, { width: 70 }]}>Atn3</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Total</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Out of</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>%</Text>
-              <Text style={[styles.headerCell, { width: 80 }]}>Marks</Text>
+            {/* --- Obtained Marks Table --- */}
+            <View style={styles.tableSection}>
+              <Text style={styles.subHeading}>Obtained Marks Details</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                <View>
+                  <View style={[styles.row, styles.headerRow]}>
+                    <Text style={[styles.headerCell, { width: 60 }]}>S.No</Text>
+                    <Text style={[styles.headerCell, { width: 200 }]}>Paper Title</Text>
+                    <Text style={[styles.headerCell, { width: 60 }]}>Sec</Text>
+                    <Text style={[styles.headerCell, { width: 70 }]}>T1</Text>
+                    <Text style={[styles.headerCell, { width: 70 }]}>T2</Text>
+                    <Text style={[styles.headerCell, { width: 70 }]}>T3</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Best</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Assg</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Atn</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Total</Text>
+                  </View>
+                  {obtainedMarks.map(item => (
+                    <View key={item.id} style={styles.row}>
+                      <Text style={[styles.cell, { width: 60 }]}>{item.id}</Text>
+                      <Text style={[styles.cell, { width: 200 }]}>{item.title}</Text>
+                      <Text style={[styles.cell, { width: 60 }]}>{item.sec}</Text>
+                      <Text style={[styles.cell, { width: 70 }]}>{item.t1}</Text>
+                      <Text style={[styles.cell, { width: 70 }]}>{item.t2}</Text>
+                      <Text style={[styles.cell, { width: 70 }]}>{item.t3}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.best}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.assg}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.atn}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.total}</Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
             </View>
-            {attendance.map(item => (
-              <View key={item.id} style={styles.row}>
-                <Text style={[styles.cell, { width: 60 }]}>{item.id}</Text>
-                <Text style={[styles.cell, { width: 200 }]}>{item.title}</Text>
-                <Text style={[styles.cell, { width: 60 }]}>{item.sec}</Text>
-                <Text style={[styles.cell, { width: 70 }]}>{item.a1}</Text>
-                <Text style={[styles.cell, { width: 70 }]}>{item.a2}</Text>
-                <Text style={[styles.cell, { width: 70 }]}>{item.a3}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.total}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.out}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.percent}</Text>
-                <Text style={[styles.cell, { width: 80 }]}>{item.marks}</Text>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
-    </ScrollView>
+
+            {/* --- Attendance Table --- */}
+            <View style={styles.tableSection}>
+              <Text style={styles.subHeading}>Attendance Details</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                <View>
+                  <View style={[styles.row, styles.headerRow]}>
+                    <Text style={[styles.headerCell, { width: 60 }]}>S.No</Text>
+                    <Text style={[styles.headerCell, { width: 200 }]}>Paper Title</Text>
+                    <Text style={[styles.headerCell, { width: 60 }]}>Sec</Text>
+                    <Text style={[styles.headerCell, { width: 70 }]}>Atn1</Text>
+                    <Text style={[styles.headerCell, { width: 70 }]}>Atn2</Text>
+                    <Text style={[styles.headerCell, { width: 70 }]}>Atn3</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Total</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Out of</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>%</Text>
+                    <Text style={[styles.headerCell, { width: 80 }]}>Marks</Text>
+                  </View>
+                  {attendance.map(item => (
+                    <View key={item.id} style={styles.row}>
+                      <Text style={[styles.cell, { width: 60 }]}>{item.id}</Text>
+                      <Text style={[styles.cell, { width: 200 }]}>{item.title}</Text>
+                      <Text style={[styles.cell, { width: 60 }]}>{item.sec}</Text>
+                      <Text style={[styles.cell, { width: 70 }]}>{item.a1}</Text>
+                      <Text style={[styles.cell, { width: 70 }]}>{item.a2}</Text>
+                      <Text style={[styles.cell, { width: 70 }]}>{item.a3}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.total}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.out}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.percent}</Text>
+                      <Text style={[styles.cell, { width: 80 }]}>{item.marks}</Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          </>
+        )}
+      </ScrollView>
+      {/* Floating Add Button */}
+      {userType === 2 && (
+        <TouchableOpacity style={styles.fab} onPress={() => router.push('createAttendance')}>
+          <Ionicons name="add" size={32} color="white" />
+        </TouchableOpacity>
+      )}
+    </>
   );
 }
 
@@ -325,7 +347,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   tableSection: {
-    marginBottom: 24,
+    marginVertical: 24,
   },
   subHeading: {
     fontSize: 18,
@@ -357,5 +379,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 6,
     textAlign: 'center',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    backgroundColor: 'teal',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -9,7 +9,7 @@ SplashScreen.preventAutoHideAsync();
 
 export const AuthContext = createContext({
   isLoggedIn: false,
-  userType: 0,
+  userType: 0, // 0-student, 1-parent, 2-teacher, 3-dept, 4-club
   authToken: null,
   userId: null,
   isReady: false, // restored auth state
